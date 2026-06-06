@@ -3,6 +3,7 @@ import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import { MongoClient } from "mongodb";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { initBoard } from "../init-board";
 
 const client = new MongoClient(process.env.MONGODB_URI!);
 const db = client.db();
@@ -22,6 +23,19 @@ export const auth = betterAuth({
     },
     emailAndPassword: {
         enabled: true,
+    },
+    databaseHooks: {
+        user : {
+            create: {
+                after: async ( user ) => {
+                    try {
+                        await initBoard( user.id );
+                    } catch ( error ) {
+                        console.error( `Error initializing board for user ${user.id}:`, error );
+                    }
+                }
+            }
+        }
     }
 });
 

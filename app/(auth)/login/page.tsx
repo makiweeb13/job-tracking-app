@@ -58,7 +58,7 @@ export default function LoginPage() {
                         </div>
                     </CardContent>
                     <CardFooter className="flex flex-col items-center">
-                    <Button type="submit" disabled={loading} className="w-full">{loading ? "Logging in..." : "Login"}</Button>
+                    <Button type="submit" disabled={loading} className="w-full mt-5">{loading ? "Logging in..." : "Login"}</Button>
                     {error && <p className="mt-2 text-red-600">{error}</p>}
                     <p className="mt-2">Don't have an account? <Link href="/sign-up" className="text-center text-indigo-600 hover:text-indigo-500">Sign Up</Link></p>
                 </CardFooter>
