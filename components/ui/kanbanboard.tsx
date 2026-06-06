@@ -1,8 +1,11 @@
 "use client"
 
 import { Board, Column } from "@/lib/models/models.type";
-import { Award, Calendar, CheckCircle, XCircle } from "lucide-react";
-import { Card, CardHeader, CardTitle } from "./card";
+import { Award, Calendar, CheckCircle, MoreVertical, Trash, XCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "./card";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
+import { Button } from "./button";
+import CreateJob from "./create-job";
 
 interface KanbanBoardProps {
     board: string | null;
@@ -36,16 +39,38 @@ const COLUMN_CONFIG: Array<columnConfig> = [
 function DroppableColumn({ column, config, board }: { column: Column; config: columnConfig; board: string | undefined }) {
     // Implement drag-and-drop logic here
     return (
-        <Card>
-            <CardHeader>
-                <div>
-                    <div className={`inline-flex h-6 w-6 items-center justify-center rounded-full ${config.color}`}>
-                        {config.icon}
-                        <CardTitle className="ml-2 text-sm font-medium text-gray-900">{column.name}</CardTitle>
-                    </div>
-                    <CardTitle className="ml-2 text-sm font-medium text-gray-900">{column.name}</CardTitle>
+        <Card className="flex flex-col h-full min-w-90 border-slate-200 shadow-sm bg-slate-50/50">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 p-4">
+                <div className="flex items-center gap-3">
+                {/* Icon Wrapper with subtle background */}
+                <div className={`p-2 rounded-lg ${config.color}`}>
+                    {config.icon}
                 </div>
+                <div>
+                    <CardTitle className="text-sm font-semibold text-slate-700 tracking-tight">
+                    {column.name}
+                    </CardTitle>
+                </div>
+                </div>
+                <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900">
+                    <MoreVertical className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
+                    <Trash className="mr-2 h-4 w-4" />
+                    Delete Column
+                    </DropdownMenuItem>
+                </DropdownMenuContent>
+                </DropdownMenu>
             </CardHeader>
+            <CardContent className="flex-1 px-3 pb-4">
+                <div className="min-h-50 min-w-50 rounded-xl border-2 border-dashed border-slate-200 bg-slate-100/50 transition-colors hover:bg-slate-100/80">
+                    <CreateJob columnId={column._id} boardId={board || ""} />
+                </div>
+            </CardContent>
         </Card>
     )
 }

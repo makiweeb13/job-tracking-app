@@ -9,6 +9,11 @@ export default async function DashboardPage() {
     const board = await Board.findOne({
         userId: session?.user?.id,
         name: "Job Hunt" 
+    }).populate({
+        path: "columns",
+        populate: {
+            path: "jobApplications"
+        }
     });
     console.log("Fetched board for user:", session?.user?.id, "Board:", board);
 
