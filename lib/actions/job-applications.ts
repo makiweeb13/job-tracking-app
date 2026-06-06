@@ -8,7 +8,7 @@ interface JobApplicationData {
     position: string;
     company: string;
     description?: string;
-    jobLink?: string;
+    jobUrl?: string;
     location?: string;
     applicationDate: string; // ISO date string
     salary?: string;
@@ -49,7 +49,7 @@ export async function createJobApplication(data: JobApplicationData) {
         position: data.position,
         company: data.company,
         description: data.description,
-        jobLink: data.jobLink,
+        jobUrl: data.jobUrl,
         location: data.location,
         applicationDate: data.applicationDate,
         salary: data.salary,

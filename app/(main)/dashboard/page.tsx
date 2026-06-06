@@ -15,7 +15,6 @@ export default async function DashboardPage() {
             path: "jobApplications"
         }
     });
-    console.log("Fetched board for user:", session?.user?.id, "Board:", board);
 
     return (
         <div className="border-b border-gray-200 bg-white px-6 py-8">

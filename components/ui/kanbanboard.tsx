@@ -1,11 +1,12 @@
 "use client"
 
-import { Board, Column } from "@/lib/models/models.type";
+import { Board, Column, JobApplication } from "@/lib/models/models.type";
 import { Award, Calendar, CheckCircle, MoreVertical, Trash, XCircle } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "./card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
 import { Button } from "./button";
 import CreateJob from "./create-job";
+import JobApplicationCard from "./job-application-card";
 
 interface KanbanBoardProps {
     board: string | null;
@@ -36,7 +37,8 @@ const COLUMN_CONFIG: Array<columnConfig> = [
     }
 ];
 
-function DroppableColumn({ column, config, board }: { column: Column; config: columnConfig; board: string | undefined }) {
+function DroppableColumn({ column, config, board, sortedColumns }: { column: Column; config: columnConfig; board: string | undefined | null; sortedColumns?: Column[] }) {
+    const sortedJobs = JSON.parse(JSON.stringify(column.jobApplications)).sort((a: any, b: any) => a.order - b.order) || [];
     // Implement drag-and-drop logic here
     return (
         <Card className="flex flex-col h-full min-w-90 border-slate-200 shadow-sm bg-slate-50/50">
@@ -68,6 +70,10 @@ function DroppableColumn({ column, config, board }: { column: Column; config: co
             </CardHeader>
             <CardContent className="flex-1 px-3 pb-4">
                 <div className="min-h-50 min-w-50 rounded-xl border-2 border-dashed border-slate-200 bg-slate-100/50 transition-colors hover:bg-slate-100/80">
+                    {/* Render job applications here */}
+                    {sortedJobs.map((job: any) => (
+                        <JobCard key={job._id} job={{...job, columnId: column._id}} columns={sortedColumns} />
+                    ))}
                     <CreateJob columnId={column._id} boardId={board || ""} />
                 </div>
             </CardContent>
@@ -75,17 +81,25 @@ function DroppableColumn({ column, config, board }: { column: Column; config: co
     )
 }
 
+function JobCard({ job, columns }: { job: JobApplication, columns?: Column[] }) {
+    return (
+        <>
+            <JobApplicationCard job={job} columns={columns} />
+        </>
+    );
+}
+
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
     const parsedBoard: Board | null = board ? JSON.parse(board) : null;
     const columns = parsedBoard?.columns || [];
-    console.log("Rendering KanbanBoard with columns:", columns);
+    const sortedColumns = columns.sort((a, b) => a.order - b.order);
     return (
         <>
             <div className="mt-6 flex space-x-4 overflow-x-auto">
                 {columns.map((column, index) => {
                     const config = COLUMN_CONFIG[index] || { color: "bg-gray-500", icon: <Calendar className="h-5 w-5 text-white" /> };
                     return (
-                        <DroppableColumn key={column._id} column={column} config={config} board={parsedBoard?._id} />
+                        <DroppableColumn key={column._id} column={column} config={config} board={parsedBoard?._id} sortedColumns={sortedColumns} />
                     );
                 })}
             </div>

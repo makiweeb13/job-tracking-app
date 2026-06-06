@@ -17,7 +17,7 @@ export default function CreateJob({ columnId, boardId }: { columnId: string; boa
         position: "",
         company: "",
         description: "",
-        jobLink: "",
+        jobUrl: "",
         location: "",
         applicationDate: "",
         salary: "",
@@ -40,7 +40,7 @@ export default function CreateJob({ columnId, boardId }: { columnId: string; boa
                 position: "",
                 company: "",
                 description: "",
-                jobLink: "",
+                jobUrl: "",
                 location: "",
                 applicationDate: "",
                 salary: "",
@@ -63,7 +63,7 @@ export default function CreateJob({ columnId, boardId }: { columnId: string; boa
                 </Button>
             </DialogTrigger>
             {/* Increased width to 600px to accommodate two columns */}
-            <DialogContent className="sm:max-w-[600px]">
+            <DialogContent className="sm:max-w-150">
                 <DialogHeader>
                     <DialogTitle className="text-xl font-bold">Create New Job Application</DialogTitle>
                     <DialogDescription>
@@ -92,8 +92,8 @@ export default function CreateJob({ columnId, boardId }: { columnId: string; boa
 
                         {/* Row 3: Link & Location */}
                         <div className="space-y-2">
-                            <Label htmlFor="job-link">Job Link</Label>
-                            <Input id="job-link" placeholder="https://..." value={formData.jobLink} onChange={(e) => setFormData({...formData, jobLink: e.target.value})} />
+                            <Label htmlFor="job-url">Job URL</Label>
+                            <Input id="job-url" placeholder="https://..." value={formData.jobUrl} onChange={(e) => setFormData({...formData, jobUrl: e.target.value})} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="location">Location</Label>
@@ -107,7 +107,7 @@ export default function CreateJob({ columnId, boardId }: { columnId: string; boa
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="salary">Salary Range</Label>
-                            <Input id="salary" type="text" placeholder="e.g. $120k - $150k" value={formData.salary} onChange={(e) => setFormData({...formData, salary: e.target.value})} />
+                            <Input id="salary" type="text" placeholder="e.g. 120k - 150k" value={formData.salary} onChange={(e) => setFormData({...formData, salary: e.target.value})} />
                         </div>
 
                         {/* Row 5: Tags (Full Width) */}
@@ -127,7 +127,7 @@ export default function CreateJob({ columnId, boardId }: { columnId: string; boa
                         <Button variant="ghost" type="button" onClick={() => setIsOpen(false)}>
                             Cancel
                         </Button>
-                        <Button type="submit" className="px-8">
+                        <Button type="submit" className="px-8" disabled={isSubmitting}>
                             Create Job
                         </Button>
                     </DialogFooter>

@@ -8,7 +8,24 @@ export interface Board {
 export interface Column {
     _id: string;
     name: string;
-    jobApplications: string[]; // Array of JobApplication IDs
+    jobApplications: JobApplication[]; // Array of JobApplication objects
     boardId: string;
     order: number;
+}
+
+export interface JobApplication {
+    _id: string;
+    position: string;
+    company: string;
+    location?: string;
+    status: string;
+    description?: string;
+    order: number;
+    notes?: string;
+    salary?: number;
+    jobUrl?: string;
+    applicationDate: string; // ISO date string
+    tags?: string[];
+    columnId: string;
+    boardId: string;
 }
