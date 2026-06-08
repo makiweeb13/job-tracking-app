@@ -2,19 +2,31 @@ import { connectToDatabase } from "@/lib/db";
 import { Board } from "@/lib/models";
 import { getSession } from "@/lib/auth/auth";
 import KanbanBoard from "@/components/ui/kanbanboard";
+import { Suspense } from "react";
 
-export default async function DashboardPage() {
-    await connectToDatabase();
-    const session = await getSession();
-    const board = await Board.findOne({
-        userId: session?.user?.id,
-        name: "Job Hunt" 
+async function fetchBoard(userId: string | undefined) {
+    'use cache';
+    if (!userId) return null;
+    const boardDoc = await Board.findOne({
+        userId: userId,
+        name: "Job Hunt"
     }).populate({
         path: "columns",
         populate: {
             path: "jobApplications"
         }
     });
+
+    if (!boardDoc) return null;
+
+    const board = JSON.parse(JSON.stringify(boardDoc));
+    return board;
+}
+
+async function DashboardPage() {
+    await connectToDatabase();
+    const session = await getSession();
+    const board = await fetchBoard(session?.user?.id ?? "");
 
     return (
         <div className="border-b border-gray-200 bg-white px-6 py-8">
@@ -28,7 +40,16 @@ export default async function DashboardPage() {
                 {/* Optional: Add a button or "Last updated" text here */}
                 <div className="text-xs text-gray-400">Updated 2m ago</div>
             </div>
-            <KanbanBoard key={board?._id} board={JSON.stringify(board)} userId={session?.user?.id} />
+            <KanbanBoard key={board?._id} board={board} userId={session?.user?.id} />
         </div>
     );
 }
+
+export default async function Dashboard() {
+    return (
+        <Suspense fallback={<div className="flex items-center justify-center h-64"><span className="text-gray-500">Loading your dashboard...</span></div>}>
+            <DashboardPage />
+        </Suspense>
+    )
+}
+        

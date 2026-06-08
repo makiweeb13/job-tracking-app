@@ -2,14 +2,14 @@
 
 import { Board, Column, JobApplication } from "@/lib/models/models.type";
 import { Award, Calendar, CheckCircle, MoreVertical, Trash, XCircle } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./card";
+import { Card, CardContent, CardHeader, CardTitle } from "./card";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
 import { Button } from "./button";
 import CreateJob from "./create-job";
 import JobApplicationCard from "./job-application-card";
 
 interface KanbanBoardProps {
-    board: string | null;
+    board: Board | null;
     userId: string | undefined;
 }
 
@@ -34,11 +34,15 @@ const COLUMN_CONFIG: Array<columnConfig> = [
     {
         color: "bg-yellow-500",
         icon: <XCircle className="h-5 w-5 text-white" />
+    },
+    {
+        color: "bg-purple-500",
+        icon: <CheckCircle className="h-5 w-5 text-white" />
     }
 ];
 
 function DroppableColumn({ column, config, board, sortedColumns }: { column: Column; config: columnConfig; board: string | undefined | null; sortedColumns?: Column[] }) {
-    const sortedJobs = JSON.parse(JSON.stringify(column.jobApplications)).sort((a: any, b: any) => a.order - b.order) || [];
+    const sortedJobs = column.jobApplications?.sort((a: JobApplication, b: JobApplication) => a.order - b.order) || [];
     // Implement drag-and-drop logic here
     return (
         <Card className="flex flex-col h-full min-w-90 border-slate-200 shadow-sm bg-slate-50/50">
@@ -90,8 +94,7 @@ function JobCard({ job, columns }: { job: JobApplication, columns?: Column[] }) 
 }
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
-    const parsedBoard: Board | null = board ? JSON.parse(board) : null;
-    const columns = parsedBoard?.columns || [];
+    const columns = board?.columns || [];
     const sortedColumns = columns.sort((a, b) => a.order - b.order);
     return (
         <>
@@ -99,7 +102,7 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
                 {columns.map((column, index) => {
                     const config = COLUMN_CONFIG[index] || { color: "bg-gray-500", icon: <Calendar className="h-5 w-5 text-white" /> };
                     return (
-                        <DroppableColumn key={column._id} column={column} config={config} board={parsedBoard?._id} sortedColumns={sortedColumns} />
+                        <DroppableColumn key={column._id} column={column} config={config} board={board?._id} sortedColumns={sortedColumns} />
                     );
                 })}
             </div>

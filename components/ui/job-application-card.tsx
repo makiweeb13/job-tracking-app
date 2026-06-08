@@ -1,6 +1,6 @@
 import { Column, JobApplication } from "@/lib/models/models.type";
 import { Card, CardContent, CardHeader, CardTitle } from "./card";
-import { MapPin, Calendar, FileText, Tag, Edit } from "lucide-react";
+import { MapPin, Calendar, FileText, Tag, Edit, Edit2Icon, Trash2Icon } from "lucide-react";
 import { Badge } from "@/components/ui/badge"; // Assuming shadcn badge
 import { Button } from "./button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
@@ -89,9 +89,16 @@ export default function JobApplicationCard({ job, columns }: jobApplicationCardP
                                 </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
-                                <DropdownMenuItem>Edit Application</DropdownMenuItem>
+                                <DropdownMenuItem><Edit2Icon className="mr-2 h-4 w-4" /> Edit</DropdownMenuItem>
+                                {columns && columns.length > 1 && (
+                                    <>
+                                        {columns.filter(col => col._id !== job.columnId).map((col) => (
+                                            <DropdownMenuItem key={col._id}>Move to {col.name}</DropdownMenuItem>
+                                        ))}
+                                    </>
+                                )}
                                 {columns?.at(2) && (
-                                    <DropdownMenuItem>Delete Application</DropdownMenuItem>
+                                    <DropdownMenuItem><Trash2Icon className="mr-2 h-4 w-4" /> Delete</DropdownMenuItem>
                                 )}
                             </DropdownMenuContent>
                         </DropdownMenu>

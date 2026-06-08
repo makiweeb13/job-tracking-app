@@ -3,6 +3,7 @@
 import { getSession } from "@/lib/auth/auth";
 import { connectToDatabase } from "@/lib/db";
 import { Board, Column, JobApplication } from "../models";
+import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate";
 
 interface JobApplicationData {
     position: string;
@@ -67,6 +68,8 @@ export async function createJobApplication(data: JobApplicationData) {
     // Update the column to include the new job application
     column.jobApplications.push(createdJobApplication._id);
     await column.save();
+
+    revalidatePath("/dashboard"); // Revalidate the dashboard page to show the new job application
 
     return { data: JSON.parse(JSON.stringify(createdJobApplication)) };
 }

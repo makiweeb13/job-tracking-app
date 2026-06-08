@@ -9,13 +9,15 @@ const COLUMN_NAMES = [{
     name: "Offer", order: 2
 }, {
     name: "Rejected", order: 3
+}, {
+    name: "Accepted", order: 4
 }];
 
 export async function initBoard( userId: string ) {
     try {
         await connectToDatabase();
         // Check if the user already has a board
-        const existingBoard = await Board.findOne({ userId });
+        const existingBoard = await Board.findOne({ userId, name: "Job Hunt" });
 
         if ( existingBoard ) {
             console.log( `Board already exists for user ${userId}` );
