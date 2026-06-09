@@ -4,6 +4,7 @@ import { MapPin, Calendar, FileText, Tag, Edit, Edit2Icon, Trash2Icon } from "lu
 import { Badge } from "@/components/ui/badge"; // Assuming shadcn badge
 import { Button } from "./button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./dropdown-menu";
+import { updateJobApplication } from "@/lib/actions/job-applications";
 
 interface jobApplicationCardProps {
     job: JobApplication;
@@ -11,6 +12,14 @@ interface jobApplicationCardProps {
 }
 
 export default function JobApplicationCard({ job, columns }: jobApplicationCardProps) {
+    async function handleMove(newColumnId: string) {
+        try {
+            const result = await updateJobApplication(job._id, { columnId: newColumnId });
+        } catch (error) {
+            console.error("Failed to move job application:", error);
+        }
+    }
+
     return (
         <Card className="group mb-3 cursor-pointer border-slate-200 shadow-sm transition-all hover:border-blue-300 hover:shadow-md">
             <CardHeader className="p-4 pb-2">
@@ -93,7 +102,9 @@ export default function JobApplicationCard({ job, columns }: jobApplicationCardP
                                 {columns && columns.length > 1 && (
                                     <>
                                         {columns.filter(col => col._id !== job.columnId).map((col) => (
-                                            <DropdownMenuItem key={col._id}>Move to {col.name}</DropdownMenuItem>
+                                            <DropdownMenuItem key={col._id} onClick={() => handleMove(col._id)}>
+                                                Move to {col.name}
+                                            </DropdownMenuItem>
                                         ))}
                                     </>
                                 )}

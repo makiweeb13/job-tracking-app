@@ -7,6 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "./button";
 import CreateJob from "./create-job";
 import JobApplicationCard from "./job-application-card";
+import { useBoards } from "@/lib/hooks/useBoards";
 
 interface KanbanBoardProps {
     board: Board | null;
@@ -94,7 +95,7 @@ function JobCard({ job, columns }: { job: JobApplication, columns?: Column[] }) 
 }
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
-    const columns = board?.columns || [];
+    const { columns } = useBoards(board);
     const sortedColumns = columns.sort((a, b) => a.order - b.order);
     return (
         <>
