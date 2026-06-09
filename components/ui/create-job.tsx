@@ -106,7 +106,7 @@ export default function CreateJob({ columnId, boardId }: { columnId: string; boa
                             <Input id="application-date" type="date" value={formData.applicationDate} onChange={(e) => setFormData({...formData, applicationDate: e.target.value})} />
                         </div>
                         <div className="space-y-2">
-                            <Label htmlFor="salary">Salary Range</Label>
+                            <Label htmlFor="salary">Salary</Label>
                             <Input id="salary" type="text" placeholder="e.g. 120k - 150k" value={formData.salary} onChange={(e) => setFormData({...formData, salary: e.target.value})} />
                         </div>
 

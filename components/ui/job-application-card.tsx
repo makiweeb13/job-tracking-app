@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Label } from "./label";
 import { Input } from "./input";
 import { Textarea } from "./textarea";
-import { updateJobApplication } from "@/lib/actions/job-applications";
+import { deleteJobApplication, updateJobApplication } from "@/lib/actions/job-applications";
 import { useState } from "react";
 
 interface jobApplicationCardProps {
@@ -73,6 +73,17 @@ export default function JobApplicationCard({ job, columns }: jobApplicationCardP
             console.error("Error updating job application:", error);
         } finally {
             setIsSubmitting(false);
+        }
+    }
+
+    async function handleDelete() {
+        try {
+            const result = await deleteJobApplication(job._id);
+            if (result.success) {
+                console.log("Job application deleted successfully");
+            }
+        } catch (error) {
+            console.error("Failed to delete job application:", error);
         }
     }
 
@@ -181,7 +192,7 @@ export default function JobApplicationCard({ job, columns }: jobApplicationCardP
                                         </>
                                     )}
                                     {columns?.at(2) && (
-                                        <DropdownMenuItem><Trash2Icon className="mr-2 h-4 w-4" /> Delete</DropdownMenuItem>
+                                        <DropdownMenuItem onClick={() => handleDelete()}><Trash2Icon className="mr-2 h-4 w-4" /> Delete</DropdownMenuItem>
                                     )}
                                 </DropdownMenuContent>
                             </DropdownMenu>
@@ -235,7 +246,7 @@ export default function JobApplicationCard({ job, columns }: jobApplicationCardP
                                 <Input id="application-date" type="date" value={formData.applicationDate} onChange={(e) => setFormData({...formData, applicationDate: e.target.value})} />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="salary">Salary Range</Label>
+                                <Label htmlFor="salary">Salary</Label>
                                 <Input id="salary" type="text" placeholder="e.g. 120k - 150k" value={formData.salary} onChange={(e) => setFormData({...formData, salary: e.target.value})} />
                             </div>
 
