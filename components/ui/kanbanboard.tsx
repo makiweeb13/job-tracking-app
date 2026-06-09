@@ -8,6 +8,10 @@ import { Button } from "./button";
 import CreateJob from "./create-job";
 import JobApplicationCard from "./job-application-card";
 import { useBoards } from "@/lib/hooks/useBoards";
+import { closestCorners, DndContext, DragEndEvent, DragOverlay, DragStartEvent, PointerSensor, useDroppable, useSensor, useSensors } from "@dnd-kit/core"
+import { SortableContext, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
+import { useState } from "react";
+import board from "@/lib/models/board";
 
 interface KanbanBoardProps {
     board: Board | null;
@@ -43,6 +47,13 @@ const COLUMN_CONFIG: Array<columnConfig> = [
 ];
 
 function DroppableColumn({ column, config, board, sortedColumns }: { column: Column; config: columnConfig; board: string | undefined | null; sortedColumns?: Column[] }) {
+    const { setNodeRef, isOver } = useDroppable({
+        id: column._id,
+        data: {
+            type: "COLUMN",
+            columnId: column._id
+        }
+    });
     const sortedJobs = column.jobApplications?.sort((a: JobApplication, b: JobApplication) => a.order - b.order) || [];
     // Implement drag-and-drop logic here
     return (
@@ -59,54 +70,129 @@ function DroppableColumn({ column, config, board, sortedColumns }: { column: Col
                     </CardTitle>
                 </div>
                 </div>
-                <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-500 hover:text-slate-900">
-                    <MoreVertical className="h-4 w-4" />
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-40">
-                    <DropdownMenuItem className="text-red-600 focus:text-red-600 focus:bg-red-50 cursor-pointer">
-                    <Trash className="mr-2 h-4 w-4" />
-                    Delete Column
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-                </DropdownMenu>
             </CardHeader>
-            <CardContent className="flex-1 px-3 pb-4">
-                <div className="min-h-50 min-w-50 rounded-xl border-2 border-dashed border-slate-200 bg-slate-100/50 transition-colors hover:bg-slate-100/80">
-                    {/* Render job applications here */}
-                    {sortedJobs.map((job: any) => (
-                        <JobCard key={job._id} job={{...job, columnId: column._id}} columns={sortedColumns} />
-                    ))}
-                    <CreateJob columnId={column._id} boardId={board || ""} />
-                </div>
+            <CardContent className={`flex-1 px-3 pb-4 ${isOver ? 'bg-slate-200' : 'bg-slate-100/50'}`} ref={setNodeRef} suppressHydrationWarning>
+                <SortableContext items={sortedJobs.map((job: any) => job._id)} strategy={verticalListSortingStrategy}>
+                    <div className="min-h-50 min-w-50 rounded-xl border-2 border-dashed border-slate-200 bg-slate-100/50 transition-colors hover:bg-slate-100/80" suppressHydrationWarning>
+                        {/* Render job applications here */}
+                        {sortedJobs.map((job: any) => (
+                            <JobCard key={job._id} job={{...job, columnId: column._id}} columns={sortedColumns} />
+                        ))}
+                        <CreateJob columnId={column._id} boardId={board || ""} />
+                    </div>
+                </SortableContext>
             </CardContent>
         </Card>
     )
 }
 
 function JobCard({ job, columns }: { job: JobApplication, columns?: Column[] }) {
+    const { attributes, listeners, transform, transition, isDragging, setNodeRef } = useSortable({
+        id: job._id,
+        data: {
+            type: "JOB",
+            job
+        }
+    })
+    const style = {
+        transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
+        transition,
+        zIndex: isDragging ? 999 : undefined,
+        opacity: isDragging ? 0.8 : 1,
+        cursor: isDragging ? "grabbing" : "grab"
+    }
     return (
-        <>
-            <JobApplicationCard job={job} columns={columns} />
-        </>
+        <div ref={setNodeRef} style={style}>
+            <JobApplicationCard job={job} columns={columns} dragHandleProps={{...attributes, ...listeners}}/>
+        </div>
     );
 }
 
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
-    const { columns } = useBoards(board);
+    const [activeId, setActiveId] = useState<string | null>(null); // Track currently dragged item
+    const { columns, moveJobApplication } = useBoards(board);
     const sortedColumns = columns.sort((a, b) => a.order - b.order);
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8
+            }
+        })
+    );
+
+    async function handleDragEnd(event: DragEndEvent) {
+        const { active, over } = event;
+        
+        setActiveId(null);
+
+        if (!over || !board?._id) return;
+
+        const activeId = active.id as string;
+        const overId = over?.id as string;
+
+        let draggedJob: JobApplication | null = null;
+        let sourceColumnId: string | null = null;
+
+        // Find the dragged job
+        for (const column of columns) {
+            const jobIndex = column.jobApplications.findIndex((job: any) => job._id === activeId);
+            if (jobIndex !== -1) {
+                draggedJob = column.jobApplications[jobIndex];
+                sourceColumnId = column._id;
+                break;
+            }
+        }
+
+        if (!draggedJob || !sourceColumnId) return;
+
+        // Determine target column and position
+        const targetColumn = columns.find(col => col._id === overId);
+        let targetColumnId: string | null = null;
+        let newOrder: number = 0;
+
+        if (targetColumn) {
+            // Dropped on a column header/empty space
+            targetColumnId = targetColumn._id;
+            newOrder = targetColumn.jobApplications.length;
+        } else {
+            // Dropped on a job - find which column it's in and its index
+            for (const column of columns) {
+                const jobIndex = column.jobApplications.findIndex((job: any) => job._id === overId);
+                if (jobIndex !== -1) {
+                    targetColumnId = column._id;
+                    newOrder = jobIndex; // Insert before this job
+                    break;
+                }
+            }
+        }
+
+        if (!targetColumnId) return;
+
+        await moveJobApplication(activeId, targetColumnId, newOrder);
+    }
+
+    async function handleDragStart(event: DragStartEvent) {
+        setActiveId(event.active.id as string);
+    }
+
     return (
-        <>
-            <div className="mt-6 flex space-x-4 overflow-x-auto">
-                {columns.map((column, index) => {
+        <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+            <div className="mt-6 flex space-x-4 overflow-x-auto" suppressHydrationWarning>
+                {sortedColumns.map((column, index) => {
                     const config = COLUMN_CONFIG[index] || { color: "bg-gray-500", icon: <Calendar className="h-5 w-5 text-white" /> };
                     return (
                         <DroppableColumn key={column._id} column={column} config={config} board={board?._id} sortedColumns={sortedColumns} />
                     );
                 })}
             </div>
-        </>
+            <DragOverlay>
+                {activeId ? (
+                    <div className="opacity-90">
+                        <JobCard job={columns.flatMap(col => col.jobApplications).find(job => job._id === activeId) as JobApplication} columns={columns} />
+                    </div>
+                ) : null}
+            </DragOverlay>
+        </DndContext>
     );
 }

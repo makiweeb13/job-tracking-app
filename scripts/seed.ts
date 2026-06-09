@@ -11,7 +11,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://techcorp.ph/jobs/software-engineer",
         location: "Makati, Metro Manila",
         applicationDate: new Date("2023-10-01"),
-        salary: 1500000,
+        salary: 75000,
         tags: ["JavaScript", "TypeScript", "React"],
         notes: "Excited about the opportunity!"
     },
@@ -22,7 +22,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://websolutions.ph/careers/frontend-developer",
         location: "BGC, Taguig",
         applicationDate: new Date("2023-10-01"),
-        salary: 1200000,
+        salary: 65000,
         tags: ["JavaScript", "TypeScript", "React"],
         notes: "Looking for a challenging role!"
     },
@@ -33,7 +33,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://datasystems.ph/jobs/backend-developer",
         location: "Quezon City",
         applicationDate: new Date("2023-10-01"),
-        salary: 1300000,
+        salary: 80000,
         tags: ["Node.js", "Express", "MongoDB"],
         notes: "Interested in working with data!"
     },
@@ -44,7 +44,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://innovatech.ph/jobs/full-stack-developer",
         location: "Makati, Metro Manila",
         applicationDate: new Date("2023-10-01"),
-        salary: 1600000,
+        salary: 90000,
         tags: ["JavaScript", "TypeScript", "React", "Node.js"],
         notes: "Excited about the opportunity!"
     },
@@ -55,7 +55,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://cloudsolutions.ph/jobs/devops-engineer",
         location: "Cebu City",
         applicationDate: new Date("2023-10-01"),
-        salary: 1500000,
+        salary: 85000,
         tags: ["Docker", "Kubernetes", "AWS"],
         notes: "Excited about the opportunity!"
     },
@@ -66,7 +66,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://analyticsph.com/careers/data-scientist",
         location: "Quezon City",
         applicationDate: new Date("2023-10-01"),
-        salary: 1400000,
+        salary: 95000,
         tags: ["Python", "Machine Learning", "Data Analysis"],
         notes: "Looking forward to working with data!"
     },
@@ -77,7 +77,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://techinnovators.ph/jobs/product-manager",
         location: "BGC, Taguig",
         applicationDate: new Date("2023-10-01"),
-        salary: 1800000,
+        salary: 105000,
         tags: ["Product Management", "Agile", "Leadership"],
         notes: "Excited about the opportunity!"
     },
@@ -88,7 +88,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://creativeagency.ph/careers/ux-designer",
         location: "Manila",
         applicationDate: new Date("2023-10-01"),
-        salary: 1000000,
+        salary: 50000,
         tags: ["UX Design", "Figma", "User Research"],
         notes: "Looking for a creative role!"
     },
@@ -99,7 +99,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://appmakers.ph/jobs/mobile-developer",
         location: "Makati, Metro Manila",
         applicationDate: new Date("2023-10-01"),
-        salary: 1300000,
+        salary: 75000,
         tags: ["React Native", "iOS", "Android"],
         notes: "Excited about mobile development!"
     },
@@ -110,7 +110,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://enterprisesolutions.ph/jobs/cloud-architect",
         location: "BGC, Taguig",
         applicationDate: new Date("2023-10-02"),
-        salary: 1900000,
+        salary: 120000,
         tags: ["AWS", "Azure", "Cloud Architecture"],
         notes: "Looking to lead cloud initiatives!"
     },
@@ -121,7 +121,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://qualityfirst.ph/careers/qa-engineer",
         location: "Quezon City",
         applicationDate: new Date("2023-10-03"),
-        salary: 1100000,
+        salary: 55000,
         tags: ["Testing", "Automation", "Selenium"],
         notes: "Passionate about quality assurance!"
     },
@@ -132,7 +132,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://techconsultants.ph/jobs/solutions-architect",
         location: "Makati, Metro Manila",
         applicationDate: new Date("2023-10-04"),
-        salary: 1700000,
+        salary: 110000,
         tags: ["Architecture", "Consulting", "Enterprise"],
         notes: "Interested in strategic solutions!"
     },
@@ -143,7 +143,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://cyberdefense.ph/jobs/security-engineer",
         location: "BGC, Taguig",
         applicationDate: new Date("2023-10-05"),
-        salary: 1600000,
+        salary: 95000,
         tags: ["Cybersecurity", "Network Security", "Compliance"],
         notes: "Excited to protect systems!"
     },
@@ -154,7 +154,7 @@ const SAMPLE_JOBS = [
         jobUrl: "https://aiinnovations.ph/jobs/ml-engineer",
         location: "Quezon City",
         applicationDate: new Date("2023-10-06"),
-        salary: 1800000,
+        salary: 115000,
         tags: ["Python", "TensorFlow", "Machine Learning"],
         notes: "Passionate about AI and ML!"
     }

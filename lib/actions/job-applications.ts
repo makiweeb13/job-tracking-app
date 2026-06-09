@@ -129,50 +129,59 @@ export async function updateJobApplication(jobId: string, updates: Partial<JobAp
 
         // Handle order in new column
         if (newOrder !== undefined) {
+            // Convert 0-based index to 1-based order
+            const targetPosition = newOrder + 1;
+            
             // Get all items in new column except the one being moved
             const newColumnItems = await JobApplication.find({ 
                 columnId: newColumnId, 
                 _id: { $ne: jobId } 
             }).sort({ order: 1 });
 
-            // Insert at the specified position
-            const insertPosition = Math.max(1, Math.min(newOrder, newColumnItems.length + 1));
+            // Shift items at and after the target position
             for (let i = 0; i < newColumnItems.length; i++) {
-                const targetOrder = i + 1 >= insertPosition ? i + 2 : i + 1;
-                newColumnItems[i].order = targetOrder;
+                const currentOrder = i + 1;
+                if (currentOrder >= targetPosition) {
+                    newColumnItems[i].order = currentOrder + 1;
+                } else {
+                    newColumnItems[i].order = currentOrder;
+                }
                 await newColumnItems[i].save();
             }
-            jobApplication.order = insertPosition;
+            jobApplication.order = targetPosition;
         } else {
             // Add to the end if no order specified
             const maxOrder = (await JobApplication.find({ columnId: newColumnId }).sort({ order: -1 }).select("order").lean()) as unknown as { order: number } | null;
             jobApplication.order = (maxOrder?.order || 0) + 1;
         }
-    } else if (newOrder !== undefined && newOrder !== jobApplication.order) {
+    } else if (newOrder !== undefined) {
         // Same column, different order
-        const columnItems = await JobApplication.find({ columnId: oldColumnId }).sort({ order: 1 });
+        // Convert 0-based index to 1-based order
+        const targetOrder = newOrder + 1;
         
-        const oldOrder = jobApplication.order;
-        const minOrder = Math.min(oldOrder, newOrder);
-        const maxOrder = Math.max(oldOrder, newOrder);
+        if (targetOrder !== jobApplication.order) {
+            const columnItems = await JobApplication.find({ columnId: oldColumnId }).sort({ order: 1 });
+            
+            const oldOrder = jobApplication.order;
 
-        for (const item of columnItems) {
-            if (item._id.toString() === jobId) continue;
+            for (const item of columnItems) {
+                if (item._id.toString() === jobId) continue;
 
-            if (oldOrder < newOrder) {
-                // Moving down
-                if (item.order > oldOrder && item.order <= newOrder) {
-                    item.order -= 1;
+                if (oldOrder < targetOrder) {
+                    // Moving down - shift items up
+                    if (item.order > oldOrder && item.order <= targetOrder) {
+                        item.order -= 1;
+                    }
+                } else {
+                    // Moving up - shift items down
+                    if (item.order >= targetOrder && item.order < oldOrder) {
+                        item.order += 1;
+                    }
                 }
-            } else {
-                // Moving up
-                if (item.order >= newOrder && item.order < oldOrder) {
-                    item.order += 1;
-                }
+                await item.save();
             }
-            await item.save();
+            jobApplication.order = targetOrder;
         }
-        jobApplication.order = newOrder;
     }
 
     // Apply other updates

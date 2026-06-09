@@ -14,9 +14,10 @@ import { useState } from "react";
 interface jobApplicationCardProps {
     job: JobApplication;
     columns?: Column[];
+    dragHandleProps?: React.HTMLAttributes<HTMLElement>;
 }
 
-export default function JobApplicationCard({ job, columns }: jobApplicationCardProps) {
+export default function JobApplicationCard({ job, columns, dragHandleProps }: jobApplicationCardProps) {
     const [isUpdateOpen, setIsUpdateOpen] = useState<boolean>(false);
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
     const [formData, setFormData] = useState({
@@ -104,7 +105,7 @@ export default function JobApplicationCard({ job, columns }: jobApplicationCardP
 
     return (
         <>
-            <Card className="group mb-3 cursor-pointer border-slate-200 shadow-sm transition-all hover:border-blue-300 hover:shadow-md">
+            <Card className="group mb-3 cursor-pointer border-slate-200 shadow-sm transition-all hover:border-blue-300 hover:shadow-md" suppressHydrationWarning {...dragHandleProps}>
                 <CardHeader className="p-4 pb-2">
                     <div className="flex justify-between items-start">
                         <div>

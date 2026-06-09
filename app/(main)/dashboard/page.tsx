@@ -37,8 +37,6 @@ async function DashboardPage() {
                     Welcome back, <span className="font-medium text-gray-900">{session?.user?.name}</span>. Here's the status of your jobs today.
                 </p>
                 </div>
-                {/* Optional: Add a button or "Last updated" text here */}
-                <div className="text-xs text-gray-400">Updated 2m ago</div>
             </div>
             <KanbanBoard key={board?._id} board={board} userId={session?.user?.id} />
         </div>
