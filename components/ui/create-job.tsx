@@ -103,7 +103,7 @@ export default function CreateJob({ columnId, boardId }: { columnId: string; boa
                         {/* Row 4: Date & Salary */}
                         <div className="space-y-2">
                             <Label htmlFor="application-date">Application Date</Label>
-                            <Input id="application-date" type="date" value={formData.applicationDate} onChange={(e) => setFormData({...formData, applicationDate: e.target.value})} />
+                            <Input id="application-date" type="date" required value={formData.applicationDate} onChange={(e) => setFormData({...formData, applicationDate: e.target.value})} />
                         </div>
                         <div className="space-y-2">
                             <Label htmlFor="salary">Salary</Label>

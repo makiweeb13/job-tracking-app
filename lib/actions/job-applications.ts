@@ -3,7 +3,7 @@
 import { getSession } from "@/lib/auth/auth";
 import { connectToDatabase } from "@/lib/db";
 import { Board, Column, JobApplication } from "../models";
-import { revalidatePath } from "next/dist/server/web/spec-extension/revalidate";
+import { revalidatePath } from "next/cache";
 
 interface JobApplicationData {
     position: string;
@@ -45,7 +45,8 @@ export async function createJobApplication(data: JobApplicationData) {
         throw new Error("Column not found in the specified board");
     }
 
-    const maxOrder = (await JobApplication.find({ columnId: data.columnId }).sort({ order: -1 }).select("order").lean()) as unknown as { order: number } | null;
+    const maxOrderDoc = await JobApplication.findOne({ columnId: data.columnId }).sort({ order: -1 }).select("order").lean();
+    const maxOrder = (maxOrderDoc as { order: number } | null)?.order ?? 0;
     
     const newJobApplication = {
         position: data.position,
@@ -54,13 +55,13 @@ export async function createJobApplication(data: JobApplicationData) {
         jobUrl: data.jobUrl,
         location: data.location,
         applicationDate: data.applicationDate,
-        salary: data.salary,
+        salary: data.salary ? Number(data.salary) : undefined,
         tags: data.tags || [],
         notes: data.notes,
         columnId: data.columnId,
         boardId: data.boardId,
         status: "Applied",
-        order: (maxOrder?.order || 0) + 1 // Add to the end of the column
+        order: maxOrder + 1
     };
 
     const createdJobApplication = await JobApplication.create(newJobApplication);
@@ -151,8 +152,9 @@ export async function updateJobApplication(jobId: string, updates: Partial<JobAp
             jobApplication.order = targetPosition;
         } else {
             // Add to the end if no order specified
-            const maxOrder = (await JobApplication.find({ columnId: newColumnId }).sort({ order: -1 }).select("order").lean()) as unknown as { order: number } | null;
-            jobApplication.order = (maxOrder?.order || 0) + 1;
+            const maxOrderDoc = await JobApplication.findOne({ columnId: newColumnId }).sort({ order: -1 }).select("order").lean();
+            const maxOrder = (maxOrderDoc as { order: number } | null)?.order ?? 0;
+            jobApplication.order = maxOrder + 1;
         }
     } else if (newOrder !== undefined) {
         // Same column, different order
@@ -185,6 +187,11 @@ export async function updateJobApplication(jobId: string, updates: Partial<JobAp
     }
 
     // Apply other updates
+    if (updates.salary !== undefined) {
+        const parsed = Number(updates.salary);
+        jobApplication.salary = Number.isNaN(parsed) ? undefined : parsed;
+    }
+    delete updates.salary;
     Object.assign(jobApplication, updates);
     await jobApplication.save();
 

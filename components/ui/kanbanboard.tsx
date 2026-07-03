@@ -78,7 +78,7 @@ function DroppableColumn({ column, config, board, sortedColumns }: { column: Col
                         {sortedJobs.map((job: any) => (
                             <JobCard key={job._id} job={{...job, columnId: column._id}} columns={sortedColumns} />
                         ))}
-                        <CreateJob columnId={column._id} boardId={board || ""} />
+                        <CreateJob columnId={column._id} boardId={board ?? ""} />
                     </div>
                 </SortableContext>
             </CardContent>
